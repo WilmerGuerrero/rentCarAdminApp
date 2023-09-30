@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FuelTypes {
+  id          Int        @id @default(autoincrement())
+  status      Boolean    @default(true)
+  name        String     @unique
+  vehicles    Vehicles[]
+  description String
+  createdAt   DateTime   @default(now())
+  updateAt    DateTime   @default(now())
+}
+
+model vehicleTypes {
+  id          Int        @id @default(autoincrement())
+  status      Boolean    @default(true)
+  name        String     @unique
+  vehicles    Vehicles[]
+  description String
+  createdAt   DateTime   @default(now())
+  updateAt    DateTime   @default(now())
+}
+
+model Makes {
+  id          Int      @id @default(autoincrement())
+  models      Models[]
+  status      Boolean  @default(true)
+  name        String   @unique
+  description String
+  createdAt   DateTime @default(now())
+  updateAt    DateTime @default(now())
+}
+
+model Models {
+  id          Int        @id @default(autoincrement())
+  make        Makes      @relation(fields: [makeId], references: [id])
+  makeId      Int
+  vehicles    Vehicles[]
+  status      Boolean    @default(true)
+  name        String     @unique
+  description String
+  createdAt   DateTime   @default(now())
+  updateAt    DateTime   @default(now())
+}
+
+model Vehicles {
+  id            Int           @id @default(autoincrement())
+  description   String
+  chassisNumber String        @unique
+  engineNumber  String        @unique
+  plateNumber   String        @unique
+  vehicleType   vehicleTypes  @relation(fields: [vehicleTypeId], references: [id])
+  vehicleTypeId Int
+  model         Models        @relation(fields: [modelId], references: [id])
+  modelId       Int
+  makeName      String
+  fuelType      FuelTypes     @relation(fields: [fuelTypeId], references: [id])
+  fuelTypeId    Int
+  inspections   Inspections[]
+  status        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updateAt      DateTime      @default(now())
+}
+
+model Users {
+  id                   Int        @id @default(autoincrement())
+  email                String     @unique
+  password             String
+  fullName             String
+  identificationNumber String     @unique
+  status               Boolean    @default(true)
+  createdAt            DateTime   @default(now())
+  updateAt             DateTime   @default(now())
+  client               Clients?
+  employee             Employees?
+}
+
+model Clients {
+  userId           Int           @id @unique
+  user             Users         @relation(fields: [userId], references: [id])
+  rents            Rents[]
+  creditCardNumber String        @unique
+  creditLimit      Decimal
+  personType       Int
+  inspections      Inspections[]
+}
+
+model Employees {
+  userId           Int           @id @unique
+  user             Users         @relation(fields: [userId], references: [id])
+  isAdmin          Boolean       @default(false)
+  rents            Rents[]
+  shift            Int
+  comissionPercent Decimal
+  startDate        DateTime      @default(now())
+  exitDate         DateTime?
+  inspections      Inspections[]
+}
+
+model Inspections {
+  id             Int       @id @default(autoincrement())
+  inspectionType Int
+  vehicleId      Int
+  vehicle        Vehicles  @relation(fields: [vehicleId], references: [id])
+  clientId       Int
+  client         Clients   @relation(fields: [clientId], references: [userId])
+  fuelAmount     Int
+  hasSpareTire   Boolean
+  hasScissorJack Boolean
+  hasGlassBreaks Boolean
+  tiresHealth    Json
+  employeeId     Int
+  employee       Employees @relation(fields: [employeeId], references: [userId])
+  status         Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updateAt       DateTime  @default(now())
+}
+
+model Rents {
+  id          Int       @id @default(autoincrement())
+  employeeId  Int
+  employee    Employees @relation(fields: [employeeId], references: [userId])
+  clientId    Int
+  client      Clients   @relation(fields: [clientId], references: [userId])
+  startDate   DateTime
+  returnDate  DateTime
+  pricePerDay Int
+  daysUsed    Int
+  comments    String
+  status      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updateAt    DateTime  @default(now())
+}
