@@ -123,20 +123,23 @@ model Inspections {
   status         Boolean   @default(true)
   createdAt      DateTime  @default(now())
   updateAt       DateTime  @default(now())
+  Rents          Rents[]
 }
 
 model Rents {
-  id          Int       @id @default(autoincrement())
-  employeeId  Int
-  employee    Employees @relation(fields: [employeeId], references: [userId])
-  clientId    Int
-  client      Clients   @relation(fields: [clientId], references: [userId])
-  startDate   DateTime
-  returnDate  DateTime
-  pricePerDay Int
-  daysUsed    Int
-  comments    String
-  status      Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updateAt    DateTime  @default(now())
+  id           Int         @id @default(autoincrement())
+  employeeId   Int
+  employee     Employees   @relation(fields: [employeeId], references: [userId])
+  clientId     Int
+  client       Clients     @relation(fields: [clientId], references: [userId])
+  inspectionId Int
+  inspection   Inspections @relation(fields: [inspectionId], references: [id])
+  startDate    DateTime
+  returnDate   DateTime
+  pricePerDay  Int
+  daysUsed     Int
+  comments     String
+  status       Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updateAt     DateTime    @default(now())
 }
