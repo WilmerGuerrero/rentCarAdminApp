@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FuelTypes } from "@prisma/client";
+import { Makes } from "@prisma/client";
 import { DynamicFormInput } from "~/typings/dynamicFormInput";
 import { BaseInventoryFields } from "~/typings/baseInventoryFields";
 
@@ -16,7 +16,7 @@ const inputFields: DynamicFormInput[] = [
   {
     key: "name",
     type: "text",
-    label: "Tipo de combustible",
+    label: "Marca",
     required: true,
   },
   {
@@ -35,13 +35,14 @@ const inputFields: DynamicFormInput[] = [
 
 const tableColumns: { key: string; label: string }[] = [
   { key: "id", label: "Identificador" },
-  { key: "name", label: "Tipo de Combustible" },
+  { key: "name", label: "Marca" },
   { key: "description", label: "Descripcion" },
   { key: "status", label: "Estatus" },
 ];
-const get = await useFetch("/api/fuelTypes/get");
+const get = await useFetch("/api/makes/get");
+
 const onDelete = async (id: number) => {
-  const { pending, status } = await useFetch(`/api/fuelTypes/${id}`, {
+  const { pending, status } = await useFetch(`/api/makes/${id}`, {
     method: "DELETE",
   });
   console.log("delete", pending.value, status.value);
@@ -52,7 +53,7 @@ const onDelete = async (id: number) => {
 
 const onSubmit = async (formData: BaseInventoryFields) => {
   console.log("form", formData);
-  await $fetch<FuelTypes>("/api/fuelTypes/put", {
+  await $fetch<Makes>("/api/makes/put", {
     method: "PUT",
     body: JSON.stringify(formData),
   });

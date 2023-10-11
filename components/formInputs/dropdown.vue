@@ -1,40 +1,38 @@
 <script setup lang="ts">
+import { DynamicFormInput } from "~/typings/dynamicFormInput";
+
+const emits = defineEmits(["onChange"]);
+
 defineProps({
-    isRequired: Boolean,
-    nonValueLabel: String,
-    key: String,
-    options: {
-        type: Array<{ label: string, value: number }>,
-        required: true
-    }
-})
+  inputField: {} as any,
+});
 
-const emits = defineEmits(['change']);
+const inputData: { [key: string]: string } = reactive({});
 
-const onChange = (newValue: string | number) => {
-    emits('change', newValue);
-}
+const onChange = (prop: string) => {
+  console.log("dropdownchange", prop, inputData[prop]);
 
-let selectedOption = ''
+  emits("onChange", inputData[prop]);
+};
 </script>
 
 <template>
-    <select 
-        :class="{ 
-            'form-select': true, 
-            'w-full': true, 
-            'is-required': isRequired }" 
-        v-model="selectedOption"
-        @change="onChange(selectedOption)"
+  <select
+    :id="inputField.key"
+    v-model="inputData[inputField.key]"
+    :required="inputField.required"
+    :values="inputField.values"
+    @change="onChange(inputField.key)"
+    class="mb-4"
+  >
+    <option value="">Seleccione una opcion:</option>
+
+    <option
+      v-for="option in inputField.values"
+      :key="option.id"
+      :value="option.id"
     >
-    <option value=""> {{ nonValueLabel }}</option>
-    <template 
-        v-for="(option, value) in options"
-        :key="`${key}-${value}`"
-    >
-        <option :value="value">{{ option }}</option>
-      </template>
-    </select>
-  </template>
-  
-  
+      {{ option.name }}
+    </option>
+  </select>
+</template>

@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { FuelTypes } from "@prisma/client";
+import { Makes, Models } from "@prisma/client";
 import { DynamicFormInput } from "~/typings/dynamicFormInput";
-import { BaseInventoryFields } from "~/typings/baseInventoryFields";
+
+const [getModels, getMakes] = await Promise.all([
+  useFetch<Models[]>("/api/models/get"),
+  useFetch<Makes[]>("/api/makes/get"),
+]);
 
 const showFormModal = ref(false);
 const formBody = ref({});
@@ -14,9 +18,19 @@ const inputFields: DynamicFormInput[] = [
     hidden: true,
   },
   {
+    key: "makeId",
+    type: "dropdown",
+    label: "Marca",
+    required: true,
+    values: getMakes.data.value?.map((make) => ({
+      id: make.id,
+      name: make.name,
+    })),
+  },
+  {
     key: "name",
     type: "text",
-    label: "Tipo de combustible",
+    label: "Modelo",
     required: true,
   },
   {
@@ -35,31 +49,32 @@ const inputFields: DynamicFormInput[] = [
 
 const tableColumns: { key: string; label: string }[] = [
   { key: "id", label: "Identificador" },
-  { key: "name", label: "Tipo de Combustible" },
+  { key: "makeId", label: "Marca" },
+  { key: "name", label: "Modelo" },
   { key: "description", label: "Descripcion" },
   { key: "status", label: "Estatus" },
 ];
-const get = await useFetch("/api/fuelTypes/get");
+
 const onDelete = async (id: number) => {
-  const { pending, status } = await useFetch(`/api/fuelTypes/${id}`, {
+  const { pending, status } = await useFetch(`/api/models/${id}`, {
     method: "DELETE",
   });
   console.log("delete", pending.value, status.value);
-  await get.refresh();
-  console.log("get data", get.data.value);
+  await getModels.refresh();
+  console.log("get data", getModels.data.value);
   return { pending, status };
 };
 
-const onSubmit = async (formData: BaseInventoryFields) => {
+const onSubmit = async (formData: Models) => {
   console.log("form", formData);
-  await $fetch<FuelTypes>("/api/fuelTypes/put", {
+  await $fetch<Models>("/api/models/put", {
     method: "PUT",
     body: JSON.stringify(formData),
   });
-  await get.refresh();
+  await getModels.refresh();
 };
 
-const onModify = async (formData: BaseInventoryFields) => {
+const onModify = async (formData: Models) => {
   formBody.value = formData;
   showFormModal.value = !showFormModal.value;
 };
@@ -114,7 +129,7 @@ const onModify = async (formData: BaseInventoryFields) => {
   </div>
   <dynamic-table
     :columns="tableColumns"
-    :data="get.data.value || []"
+    :data="getModels.data.value || []"
     @delete-row="onDelete($event)"
     @modify-row="onModify($event)"
   >
