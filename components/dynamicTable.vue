@@ -10,8 +10,13 @@ const { data, columns } = defineProps({
   },
 });
 
+watch(data, (value, oldValue) => {
+  console.log("table refreshed", oldValue, value);
+  debugger;
+});
+
 const totalCount = ref(data.length);
-const pageSize = 2;
+const pageSize = 3;
 const pages = ref(Math.ceil(totalCount.value / pageSize));
 const currentPage = ref(1);
 
@@ -27,14 +32,22 @@ interface Record {
   [key: string]: string;
 }
 
-const emits = defineEmits(["sort", "search"]);
-
 const goPrev = () => {
   if (canGoPrev.value) currentPage.value--;
 };
 
 const goNext = () => {
   if (canGoNext.value) currentPage.value++;
+};
+
+const emits = defineEmits(["delete-row", "modify-row"]);
+
+const onDelete = (id: number) => {
+  emits("delete-row", id);
+};
+
+const onModify = (item: Record) => {
+  emits("modify-row", { ...item });
 };
 </script>
 
@@ -53,6 +66,7 @@ const goNext = () => {
           >
             {{ header.label }}
           </th>
+          <th scope="col" class="px-6 py-3"></th>
         </tr>
       </thead>
       <tbody>
@@ -69,6 +83,21 @@ const goNext = () => {
           >
             {{ row[column.key] }}
           </th>
+
+          <td>
+            <button
+              @click="onModify(row)"
+              class="bg-gray-500 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded mr-1"
+            >
+              Editar
+            </button>
+            <button
+              @click="onDelete(row.id)"
+              class="bg-red-500 hover:bg-red-700 text-white font-medium px-4 py-2 rounded"
+            >
+              Eliminar
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>

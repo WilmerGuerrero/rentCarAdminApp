@@ -31,9 +31,7 @@ const activeRoute = router.currentRoute.value;
           <NuxtLink to="/inventory/fuelTypes"> Tipos de combustible </NuxtLink>
         </li>
         <li>
-          <NuxtLink to="/inventory/vehicle-types">
-            Tipos de vehiculos
-          </NuxtLink>
+          <NuxtLink to="/inventory/vehicleTypes"> Tipos de vehiculos </NuxtLink>
         </li>
         <li>
           <NuxtLink to="/inventory/makes"> Marcas </NuxtLink>
